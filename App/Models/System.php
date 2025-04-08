@@ -2,23 +2,44 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Tenant;
 
 class System extends Model
 {
-    use HasFactory;
+    use SoftDeletes;
 
-    // Si la tabla no sigue la convención de nombres, especifica el nombre de la tabla
-    protected $table = 'systems';
-
-    // Define los campos que se pueden asignar masivamente
     protected $fillable = [
-        'name',
-        'slug',
-        'description',
-        'icon',
-        'url',
-        'is_active',
+        'name', 'slug', 'description', 'icon', 
+        'entry_point', 'metadata', 'is_active', 'is_public'
     ];
+
+    protected $casts = [
+        'metadata' => 'array',
+        'is_active' => 'boolean',
+        'is_public' => 'boolean',
+    ];
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class)
+            ->withPivot('role', 'permissions')
+            ->withTimestamps();
+    }
+
+    public function tenants()
+    {
+        return $this->hasMany(Tenant::class);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 }

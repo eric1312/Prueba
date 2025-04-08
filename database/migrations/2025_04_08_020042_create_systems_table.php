@@ -15,11 +15,14 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('slug')->unique();
-            $table->text('description');
-            $table->string('icon');
-            $table->string('url');
+            $table->text('description')->nullable();
+            $table->string('icon')->default('default-icon.svg');
+            $table->string('entry_point'); // URL or route
+            $table->json('metadata')->nullable(); // Configuración adicional
             $table->boolean('is_active')->default(true);
+            $table->boolean('is_public')->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

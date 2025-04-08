@@ -21,7 +21,7 @@ class SystemPolicy
      */
     public function view(User $user, System $system): bool
     {
-        return false;
+        return $system->is_public || $user->systems->contains($system->id);
     }
 
     /**
@@ -30,6 +30,13 @@ class SystemPolicy
     public function create(User $user): bool
     {
         return false;
+    }
+    public function access(User $user, System $system)
+    {
+    return $user->systems()
+        ->where('system_id', $system->id)
+        ->wherePivot('role', '!=', 'pending')
+        ->exists();
     }
 
     /**
