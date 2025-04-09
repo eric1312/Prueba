@@ -1,19 +1,31 @@
 <?php
-// routes/api.php
+
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Systems\SystemController; // Corregido: "App" en mayúscula
-use App\Http\Controllers\PostsController; // Asegúrate de que la ruta sea correcta
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\SystemController;
+use App\Http\Controllers\TenantController;
 
-Route::get('/posts', function () {
-    return response()->json([
-        ['id' => 1, 'title' => 'Post 1'],
-        ['id' => 2, 'title' => 'Post 2'],
-    ]);
-});
-
-// Asegúrate de que el controlador SystemController exista
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/systems', [SystemController::class, 'index']); // Ruta para listar sistemas
-    Route::get('/systems/{system}', [SystemController::class, 'show']) // Ruta para mostrar un sistema específico
-         ->middleware('can:access,system');
+Route::prefix('v1')->group(function () {
+    // Autenticación
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+    
+    // Rutas protegidas
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/logout', [AuthController::class, 'logout']);
+        Route::get('/user', [AuthController::class, 'user']);
+        
+        // Sistemas
+        Route::get('/systems/mine', [SystemController::class, 'userSystems']);
+        Route::post('/systems/{system}/attach-user', [SystemController::class, 'attachUser']);
+        
+        // Tenants
+        Route::apiResource('tenants', TenantController::class)->except(['update', 'destroy']);
+        Route::get('/tenants/{tenant}/users', [TenantController::class, 'users']);
+        Route::post('/systems/{system}/tenants', [TenantController::class, 'store']);
+    });
+    
+    // Rutas públicas
+    Route::apiResource('systems', SystemController::class)->only(['index', 'show']);
 });
