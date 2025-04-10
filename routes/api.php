@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\SystemController;
 use App\Http\Controllers\TenantController;
+use App\Http\Controllers\UsuarioController; 
 
 Route::prefix('v1')->group(function () {
     // Autenticación
@@ -19,6 +20,9 @@ Route::prefix('v1')->group(function () {
         // Sistemas
         Route::get('/systems/mine', [SystemController::class, 'userSystems']);
         Route::post('/systems/{system}/attach-user', [SystemController::class, 'attachUser']);
+
+        // Usuarios
+        Route::get('/usuarios', [UsuarioController::class, 'index']); // Ruta protegida
         
         // Tenants
         Route::apiResource('tenants', TenantController::class)->except(['update', 'destroy']);
