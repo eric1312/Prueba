@@ -4,7 +4,7 @@ export default function App() {
     return (
         <div>
             <h1>Laravel con React</h1>
-            <p>Integración exitosa!</p>
+            <p>Integración exitosa de Login!</p>
         </div>
     );
 }
